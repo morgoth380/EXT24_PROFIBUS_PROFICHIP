@@ -63,7 +63,7 @@ MaxTsdr_12M=95
 ;==============================================================================
 
 OrderNumber="CP24"
-Slave_Family = 9
+Slave_Family = 1
 Implementation_Type = "CP24"
 Info_Text="CP24: PROFIBUS DPV0 - slave"
 Bitmap_Device = "CP24_1N"
