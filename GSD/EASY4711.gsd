@@ -1,0 +1,654 @@
+;
+;********************* GSD-Datei for VPC3 Demo application **************************
+;* ================================================================================ *
+;*                                                                                  *
+;* Vendor:   profichip GmbH                                                         *
+;*           Einsteinstr. 6                                                         *
+;*           91074 Herzogenaurach                                                   *
+;*           Germany                                                                *
+;*           Tel.: ++49-9132-744-200                                                *
+;*           FAX.: ++49-9132-744-204                                                *
+;*                                                                                  *
+;* ================================================================================ *
+;*                                                                                  *
+;* Function:       Demo for PROFICHIP Software                                      *
+;*                                                                                  *
+;*                                                                                  *
+;* Order Number : PA007062                                                          *
+;*                                                                                  *
+;* -------------------------------------------------------------------------------- *
+;* author: P. Fredehorst                                                            *
+;*                                                                                  *
+;*   Tel.: ++49-9132-744-214                                                        *
+;*   FAX.: ++49-9132-744-204                                                        *
+;* -------------------------------------------------------------------------------- *
+;*                                                                                  *
+;* history                                                                          *
+;* ================================================================================ *
+;* 09.09.2005 [V1.00]  Urversion                                                    *
+;*                                                                                  *
+;* -------------------------------------------------------------------------------- *
+;*                                                                                  *
+;************************************************************************************
+
+
+#Profibus_DP
+
+
+;====================================================================================
+;==== Prm-Text-Def-List =============================================================
+;====================================================================================
+
+;=====================================================================================
+;==== Ext-User-Prm-Data-Def-List =====================================================
+;=====================================================================================
+
+
+;=====================================================================================
+;==== General DP Keywords ============================================================
+;=====================================================================================
+
+GSD_Revision = 5
+Vendor_Name = "profichip GmbH"
+Model_Name = "EASY4711"
+Revision = "1.00"
+Ident_Number = 0x4711
+Protocol_Ident = 0
+Station_Type = 0
+FMS_supp = 0
+Hardware_Release = "V1.00"
+Software_Release = "V1.00"
+Redundancy = 0
+Repeater_Ctrl_Sig = 2
+24V_Pins = 0
+
+
+;==============================================================================
+;==== Supported baudrates =====================================================
+;==============================================================================
+
+9.6_supp = 1
+19.2_supp = 1
+45.45_supp = 1
+93.75_supp = 1
+187.5_supp = 1
+500_supp = 1
+1.5M_supp = 1
+3M_supp = 1
+6M_supp = 1
+12M_supp = 1
+
+MaxTsdr_9.6=15
+MaxTsdr_19.2=15
+MaxTsdr_45.45=15
+MaxTsdr_93.75=15
+MaxTsdr_187.5=15
+MaxTsdr_500=15
+MaxTsdr_1.5M=20
+MaxTsdr_3M=35
+MaxTsdr_6M=50
+MaxTsdr_12M=95
+
+
+;==============================================================================
+;==== Slave specific values ===================================================
+;==============================================================================
+
+OrderNumber="PA006300"
+Slave_Family = 9
+Implementation_Type = "VPC3+"
+Info_Text="PROFICHIP: PROFIBUS DPV0 - slave, Project EASY4711"
+Bitmap_Device = "EASY_1N"
+
+Freeze_Mode_supp=1
+Sync_Mode_supp=1
+Fail_Safe=1
+Auto_Baud_supp=1
+Set_Slave_Add_supp=0
+
+Min_Slave_Intervall=6
+
+Modular_Station=1
+Max_Module=24
+Max_Input_Len=168
+Max_Output_Len=150
+Max_Data_Len=318
+Max_Diag_Data_Len=6
+
+;==============================================================================
+;==== User-Prm-Data ===========================================================
+;==============================================================================
+
+Max_User_Prm_Data_Len = 3
+Ext_User_Prm_Data_Const(0)= 0x00,0x00,0x00
+
+
+;==============================================================================
+;==== Module-Definition-List ==================================================
+;==============================================================================
+
+Module = "Read 1 Words(InpRegs)" 0x50
+1
+EndModule
+
+Module = "Read 1 Words(HoldRegs)" 0x50
+2
+EndModule
+
+Module = "Read 2 Words(InpRegs)" 0x51
+3
+EndModule
+
+Module = "Read 2 Words(HoldRegs)" 0x51
+4
+EndModule
+
+Module = "Read 3 Words(InpRegs)" 0xD2
+5
+EndModule
+
+Module = "Read 3 Words(HoldRegs)" 0xD2
+6
+EndModule
+
+Module = "Read 4 Words(InpRegs)" 0xD3
+7
+EndModule
+
+Module = "Read 4 Words(HoldRegs)" 0xD3
+8
+EndModule
+
+Module = "Read 5 Words(InpRegs)" 0xD4
+9
+EndModule
+
+Module = "Read 5 Words(HoldRegs)" 0xD4
+10
+EndModule
+
+Module = "Read 6 Words(InpRegs)" 0xD5
+11
+EndModule
+
+Module = "Read 6 Words(HoldRegs)" 0xD5
+12
+EndModule
+
+Module = "Read 7 Words(InpRegs)" 0xD6
+13
+EndModule
+
+Module = "Read 7 Words(HoldRegs)" 0xD6
+14
+EndModule
+
+Module = "Read 8 Words(InpRegs)" 0xD7
+15
+EndModule
+
+Module = "Read 8 Words(HoldRegs)" 0xD7
+16
+EndModule
+
+Module = "Read 9 Words(InpRegs)" 0xD8
+17
+EndModule
+
+Module = "Read 9 Words(HoldRegs)" 0xD8
+18
+EndModule
+
+Module = "Read 10 Words(InpRegs)" 0xD9
+19
+EndModule
+
+Module = "Read 10 Words(HoldRegs)" 0xD9
+20
+EndModule
+
+Module = "Read 11 Words(InpRegs)" 0xDA
+21
+EndModule
+
+Module = "Read 11 Words(HoldRegs)" 0xDA
+22
+EndModule
+
+Module = "Read 12 Words(InpRegs)" 0xDB
+23
+EndModule
+
+Module = "Read 12 Words(HoldRegs)" 0xDB
+24
+EndModule
+
+Module = "Read 13 Words(InpRegs)" 0xDC
+25
+EndModule
+
+Module = "Read 13 Words(HoldRegs)" 0xDC
+26
+EndModule
+
+Module = "Read 14 Words(InpRegs)" 0xDD
+27
+EndModule
+
+Module = "Read 14 Words(HoldRegs)" 0xDD
+28
+EndModule
+
+Module = "Read 15 Words(InpRegs)" 0xDE
+29
+EndModule
+
+Module = "Read 15 Words(HoldRegs)" 0xDE
+30
+EndModule
+
+Module = "Read 16 Words(InpRegs)" 0xDF
+31
+EndModule
+
+Module = "Read 16 Words(HoldRegs)" 0xDF
+32
+EndModule
+
+Module = "Read 18 Words(InpRegs)" 0xDF,0xD1
+33
+EndModule
+
+Module = "Read 18 Words(HoldRegs)" 0xDF,0xD1
+34
+EndModule
+
+Module = "Read 20 Words(InpRegs)" 0xDF,0xD3
+35
+EndModule
+
+Module = "Read 20 Words(HoldRegs)" 0xDF,0xD3
+36
+EndModule
+
+Module = "Read 22 Words(InpRegs)" 0xDF,0xD5
+37
+EndModule
+
+Module = "Read 22 Words(HoldRegs)" 0xDF,0xD5
+38
+EndModule
+
+Module = "Read 24 Words(InpRegs)" 0xDF,0xD7
+39
+EndModule
+
+Module = "Read 24 Words(HoldRegs)" 0xDF,0xD7
+40
+EndModule
+
+Module = "Read 26 Words(InpRegs)" 0xDF,0xD9
+41
+EndModule
+
+Module = "Read 26 Words(HoldRegs)" 0xDF,0xD9
+42
+EndModule
+
+Module = "Read 28 Words(InpRegs)" 0xDF,0xDB
+43
+EndModule
+
+Module = "Read 28 Words(HoldRegs)" 0xDF,0xDB
+44
+EndModule
+
+Module = "Read 30 Words(InpRegs)" 0xDF,0xDD
+45
+EndModule
+
+Module = "Read 30 Words(HoldRegs)" 0xDF,0xDD
+46
+EndModule
+
+Module = "Read 32 Words(InpRegs)" 0xDF,0xDF
+47
+EndModule
+
+Module = "Read 32 Words(HoldRegs)" 0xDF,0xDF
+48
+EndModule
+
+Module = "Read 34 Words(InpRegs)" 0xDF,0xDF,0xD1
+49
+EndModule
+
+Module = "Read 34 Words(HoldRegs)" 0xDF,0xDF,0xD1
+50
+EndModule
+
+Module = "Read 36 Words(InpRegs)" 0xDF,0xDF,0xD3
+51
+EndModule
+
+Module = "Read 36 Words(HoldRegs)" 0xDF,0xDF,0xD3
+52
+EndModule
+
+Module = "Read 38 Words(InpRegs)" 0xDF,0xDF,0xD5
+53
+EndModule
+
+Module = "Read 38 Words(HoldRegs)" 0xDF,0xDF,0xD5
+54
+EndModule
+
+Module = "Read 40 Words(InpRegs)" 0xDF,0xDF,0xD7
+55
+EndModule
+
+Module = "Read 40 Words(HoldRegs)" 0xDF,0xDF,0xD7
+56
+EndModule
+
+Module = "Read 42 Words(InpRegs)" 0xDF,0xDF,0xD9
+57
+EndModule
+
+Module = "Read 42 Words(HoldRegs)" 0xDF,0xDF,0xD9
+58
+EndModule
+
+Module = "Read 44 Words(InpRegs)" 0xDF,0xDF,0xDB
+59
+EndModule
+
+Module = "Read 44 Words(HoldRegs)" 0xDF,0xDF,0xDB
+60
+EndModule
+
+Module = "Read 46 Words(InpRegs)" 0xDF,0xDF,0xDD
+61
+EndModule
+
+Module = "Read 46 Words(HoldRegs)" 0xDF,0xDF,0xDD
+62
+EndModule
+
+Module = "Read 48 Words(InpRegs)" 0xDF,0xDF,0xDF
+63
+EndModule
+
+Module = "Read 48 Words(HoldRegs)" 0xDF,0xDF,0xDF
+64
+EndModule
+
+Module = "Read 50 Words(InpRegs)" 0xDF,0xDF,0xDF,0xD1
+65
+EndModule
+
+Module = "Read 50 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xD1
+66
+EndModule
+
+Module = "Read 52 Words(InpRegs)" 0xDF,0xDF,0xDF,0xD3
+67
+EndModule
+
+Module = "Read 52 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xD3
+68
+EndModule
+
+Module = "Read 54 Words(InpRegs)" 0xDF,0xDF,0xDF,0xD5
+69
+EndModule
+
+Module = "Read 54 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xD5
+70
+EndModule
+
+Module = "Read 56 Words(InpRegs)" 0xDF,0xDF,0xDF,0xD7
+71
+EndModule
+
+Module = "Read 56 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xD7
+72
+EndModule
+
+Module = "Read 58 Words(InpRegs)" 0xDF,0xDF,0xDF,0xD9
+73
+EndModule
+
+Module = "Read 58 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xD9
+74
+EndModule
+
+Module = "Read 60 Words(InpRegs)" 0xDF,0xDF,0xDF,0xDB
+75
+EndModule
+
+Module = "Read 60 Words(HoldRegs)" 0xDF,0xDF,0xDF,0xDB
+76
+EndModule
+
+Module = "Write 8 bits(Coils)" 0x20
+77
+EndModule
+
+Module = "Write 16 bits(Coils)" 0x21
+78
+EndModule
+
+Module = "Write 24 bits(Coils)" 0x22
+79
+EndModule
+
+Module = "Write 32 bits(Coils)" 0x23
+80
+EndModule
+
+Module = "Write 40 bits(Coils)" 0x24
+81
+EndModule
+
+Module = "Write 48 bits(Coils)" 0x25
+82
+EndModule
+
+Module = "Write 56 bits(Coils)" 0x26
+83
+EndModule
+
+Module = "Write 64 bits(Coils)" 0x27
+84
+EndModule
+
+Module = "Write 72 bits(Coils)" 0x28
+85
+EndModule
+
+Module = "Write 80 bits(Coils)" 0x29
+86
+EndModule
+
+Module = "Write 88 bits(Coils)" 0x2A
+87
+EndModule
+
+Module = "Write 96 bits(Coils)" 0x2B
+88
+EndModule
+
+Module = "Write 104 bits(Coils)" 0x2C
+89
+EndModule
+
+Module = "Write 112 bits(Coils)" 0x2D
+90
+EndModule
+
+Module = "Write 120 bits(Coils)" 0x2E
+91
+EndModule
+
+Module = "Write 128 bits(Coils)" 0x2F
+92
+EndModule
+
+Module = "Write 136 bits(Coils)" 0x2F,0x20
+93
+EndModule
+
+Module = "Write 144 bits(Coils)" 0x2F,0x21
+94
+EndModule
+
+Module = "Write 152 bits(Coils)" 0x2F,0x22
+95
+EndModule
+
+Module = "Write 160 bits(Coils)" 0x2F,0x23
+96
+EndModule
+
+Module = "Write 168 bits(Coils)" 0x2F,0x24
+97
+EndModule
+
+Module = "Write 176 bits(Coils)" 0x2F,0x25
+98
+EndModule
+
+Module = "Write 184 bits(Coils)" 0x2F,0x26
+99
+EndModule
+
+Module = "Write 192 bits(Coils)" 0x2F,0x27
+100
+EndModule
+
+Module = "Write 200 bits(Coils)" 0x2F,0x28
+101
+EndModule
+
+Module = "Write 208 bits(Coils)" 0x2F,0x29
+102
+EndModule
+
+Module = "Write 216 bits(Coils)" 0x2F,0x2A
+103
+EndModule
+
+Module = "Write 224 bits(Coils)" 0x2F,0x2B
+104
+EndModule
+
+Module = "Write 232 bits(Coils)" 0x2F,0x2C
+105
+EndModule
+
+Module = "Write 240 bits(Coils)" 0x2F,0x2D
+106
+EndModule
+
+Module = "Write 248 bits(Coils)" 0x2F,0x2E
+107
+EndModule
+
+Module = "Write 1 Words(HldRegs)" 0x60
+108
+EndModule
+
+Module = "Write 2 Words(HldRegs)" 0x61
+109
+EndModule
+
+Module = "Write 3 Words(HldRegs)" 0xE2
+110
+EndModule
+
+Module = "Write 4 Words(HldRegs)" 0xE3
+111
+EndModule
+
+Module = "Write 5 Words(HldRegs)" 0xE4
+112
+EndModule
+
+Module = "Write 6 Words(HldRegs)" 0xE5
+113
+EndModule
+
+Module = "Write 7 Words(HldRegs)" 0xE6
+114
+EndModule
+
+Module = "Write 8 Words(HldRegs)" 0xE7
+115
+EndModule
+
+Module = "Write 9 Words(HldRegs)" 0xE8
+116
+EndModule
+
+Module = "Write 10 Words(HldRegs)" 0xE9
+117
+EndModule
+
+Module = "Write 11 Words(HldRegs)" 0xEA
+118
+EndModule
+
+Module = "Write 12 Words(HldRegs)" 0xEB
+119
+EndModule
+
+Module = "Write 13 Words(HldRegs)" 0xEC
+120
+EndModule
+
+Module = "Write 14 Words(HldRegs)" 0xED
+121
+EndModule
+
+Module = "Write 15 Words(HldRegs)" 0xEE
+122
+EndModule
+
+Module = "Write 16 Words(HldRegs)" 0xEF
+123
+EndModule
+
+Module = "Write 18 Words(HldRegs)" 0xEF,0xE1
+124
+EndModule
+
+Module = "Write 20 Words(HldRegs)" 0xEF,0xE3
+125
+EndModule
+
+Module = "Write 22 Words(HldRegs)" 0xEF,0xE5
+126
+EndModule
+
+Module = "Write 24 Words(HldRegs)" 0xEF,0xE7
+127
+EndModule
+
+Module = "Write 26 Words(HldRegs)" 0xEF,0x6E
+128
+EndModule
+
+Module = "Write 28 Words(HldRegs)" 0xEF,0xEB
+129
+EndModule
+
+Module = "Write 30 Words(HldRegs)" 0xEF,0xED
+130
+EndModule
+
+Module = "Write 32 Words(HldRegs)" 0xEF,0xEF
+131
+EndModule
+
+

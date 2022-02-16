@@ -1204,6 +1204,9 @@
                     <name>$PROJ_DIR$\..\DPV0_DRV\dp_if.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\DPV0_DRV\dp_if.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\DPV0_DRV\dp_isr.c</name>
                 </file>
                 <file>
