@@ -1219,10 +1219,16 @@
                     <name>$PROJ_DIR$\..\Core\Src\spi.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Core\Inc\stm32f1xx_hal_conf.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Core\Src\stm32f1xx_hal_msp.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\stm32f1xx_it.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Core\Src\tim.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\usart.c</name>

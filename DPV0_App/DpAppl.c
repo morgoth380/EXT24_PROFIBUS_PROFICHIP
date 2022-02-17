@@ -14,6 +14,7 @@
 #include "platform.h"
 #include "DpAppl.h"
 
+uint16_t DP_State;
 /*---------------------------------------------------------------------------*/
 /* defines, structures                                                       */
 /*---------------------------------------------------------------------------*/
@@ -317,6 +318,7 @@ uint8_t bDpState;
    {
       case WAIT_PRM:
       {
+        DP_State = WAIT_PRM;
          #ifdef EvaBoard_AT89C5132
             // set LED's
             CLR_LED_YLW__;
@@ -328,6 +330,7 @@ uint8_t bDpState;
 
       case WAIT_CFG:
       {
+         DP_State = WAIT_CFG;
          #ifdef EvaBoard_AT89C5132
             // set LED's
             CLR_LED_YLW__;
@@ -339,6 +342,7 @@ uint8_t bDpState;
 
       case DATA_EX:
       {
+         DP_State = DATA_EX;
          #ifdef EvaBoard_AT89C5132
             // set LED's
             SET_LED_YLW__;
@@ -361,6 +365,7 @@ uint8_t bDpState;
       case DP_ERROR:
       default:
       {
+         DP_State = DP_ERROR;
          sVpc3Error.bErrorCode = VPC3_GET_DP_STATE();
          DpAppl_FatalError( _DP_USER, __LINE__, &sVpc3Error );
          break;
