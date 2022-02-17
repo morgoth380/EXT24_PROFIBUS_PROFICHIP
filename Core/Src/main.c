@@ -411,7 +411,7 @@ void CopyFromVpc3( MEM_UNSIGNED8_PTR pLocalMemory, VPC3_UNSIGNED8_PTR pToVpc3Mem
  */
 void TestVpc3_01( void )
 {
-uint8_t bValue;
+   uint8_t bValue;
 
    DpAppl_SetResetVPC3Channel1();
    Vpc3Wait_1ms();
@@ -471,7 +471,7 @@ int main(void)
 /*---------------------------------------------------------------------------*/
 /* interrupt: external interrupt 0                                           */
 /*---------------------------------------------------------------------------*/
-#ifdef EvaBoard_AT89C5132
+#ifdef DPV_ISR_PROCESSING
    #if( VPC3_SERIAL_MODE == 0 )
 
       void ex0_ISR (void) interrupt IRQ_INT0
@@ -480,7 +480,7 @@ int main(void)
       }//void ex0_ISR (void) interrupt IRQ_INT0
 
    #endif//#if( VPC3_SERIAL_MODE == 0 )
-#endif//#ifdef EvaBoard_AT89C5132
+#endif//#ifdef DPV_ISR_PROCESSING
 
 
 /**

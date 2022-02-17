@@ -41,20 +41,6 @@ DP_APPL_STRUC              sDpAppl;             /**< User application structure.
 /* defines, structures and variables for our demo application                */
 /*---------------------------------------------------------------------------*/
 
-#ifdef EvaBoard_AT89C5132
-   #if VPC3_SERIAL_MODE
-      #if VPC3_SPI
-         ROMCONST__ uint8_t NAME[12] = { 0x45, 0x41, 0x53, 0x59, 0x34, 0x37, 0x31, 0x31, 0x2D, 0x53, 0x50, 0x49 }; //EASY4711-SPI
-      #endif//#if VPC3_SPI
-
-      #if VPC3_I2C
-         ROMCONST__ uint8_t NAME[12] = { 0x45, 0x41, 0x53, 0x59, 0x34, 0x37, 0x31, 0x31, 0x2D, 0x49, 0x49, 0x43 }; //EASY4711-IIC
-      #endif//#if VPC3_I2C
-   #else
-         ROMCONST__ uint8_t NAME[12] = { 0x45, 0x41, 0x53, 0x59, 0x34, 0x37, 0x31, 0x31, 0x20, 0x20, 0x20, 0x20 }; //EASY4711
-   #endif//#if VPC3_SERIAL_MODE
-#endif//#ifdef EvaBoard_AT89C5132
-
 /*---------------------------------------------------------------------------*/
 /* function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
@@ -115,16 +101,11 @@ uint8_t             bOutputState;      /**< State of output data. */
       if( pToOutputBuffer )
       {
          CopyFromVpc3_( &sDpAppl.abDpOutputData[0], pToOutputBuffer, pDpSystem->bOutputDataLength );
-
+         #warning тут обрабатываем принятые от ПЛК данные
          /** @todo Write the output data to the output modules. */
-
-         #ifdef EvaBoard_AT89C5132
-            *WRITE_PORT1 = sDpAppl.abDpOutputData[0];
-            *WRITE_PORT2 = sDpAppl.abDpOutputData[1];
-         #endif//#ifdef EvaBoard_AT89C5132
-      }//if( pToOutputBuffer )
-   }//if( DpAppl_TestApplEvent( eDpApplEv_IoOut ) )
-}//static void DpAppl_CheckEvIoOut( void )
+      }
+   }
+}
 
 /*--------------------------------------------------------------------------*/
 /* function: DpAppl_ReadInputData                                           */
@@ -135,11 +116,6 @@ uint8_t             bOutputState;      /**< State of output data. */
 static void DpAppl_ReadInputData( void )
 {
    /** @todo Read cyclically the input module. */
-
-   #ifdef EvaBoard_AT89C5132
-      sDpAppl.abDpInputData[0] = *READ_PORT1;
-      sDpAppl.abDpInputData[1] = *READ_PORT2;
-   #endif//#ifdef EvaBoard_AT89C5132
 
 #warning реализовать запись данными, принятыми от CP24
       sDpAppl.abDpInputData[0] = 0xBB;
@@ -224,12 +200,9 @@ DP_ERROR_CODE       bError;
 
    if( DP_OK == bError )
    {
-      #ifdef EvaBoard_AT89C5132
-         bError = VPC3_Initialization( (*READ_PORT0 & 0x7F), IDENT_NR, (psCFG)&sDpAppl.sCfgData );     // address of slave; PORT0
-      #else
-         bError = VPC3_Initialization( DP_ADDR, IDENT_NR, (psCFG)&sDpAppl.sCfgData );                  // address of slave
-      #endif//#ifdef EvaBoard_AT89C5132
 
+      bError = VPC3_Initialization( DP_ADDR, IDENT_NR, (psCFG)&sDpAppl.sCfgData );                  // address of slave
+      
       if( DP_OK == bError )
       {
          DpAppl_EnableInterruptVPC3Channel1();
@@ -287,11 +260,6 @@ uint8_t bDpState;
       memset( &sDpAppl.abDpOutputData , 0, DOUT_BUFSIZE );
       memset( &sDpAppl.abDpInputData,   0, DIN_BUFSIZE );
 
-      #ifdef EvaBoard_AT89C5132
-         *WRITE_PORT1 = 0x00;
-         *WRITE_PORT2 = 0x00;
-      #endif//#ifdef EvaBoard_AT89C5132
-
       VPC3_ClrDpState( eDpStateInit );
       VPC3_SetDpState( eDpStateRun );
    }//if( VPC3_GetDpState( eDpStateInit ) )
@@ -319,23 +287,13 @@ uint8_t bDpState;
       case WAIT_PRM:
       {
         DP_State = WAIT_PRM;
-         #ifdef EvaBoard_AT89C5132
-            // set LED's
-            CLR_LED_YLW__;
-            SET_LED_RED__;
-         #endif//#ifdef EvaBoard_AT89C5132
-
+       
          break;
       }//case WAIT_PRM:
 
       case WAIT_CFG:
       {
          DP_State = WAIT_CFG;
-         #ifdef EvaBoard_AT89C5132
-            // set LED's
-            CLR_LED_YLW__;
-            SET_LED_RED__;
-         #endif//#ifdef EvaBoard_AT89C5132
 
          break;
       }//case WAIT_CFG:
@@ -343,11 +301,6 @@ uint8_t bDpState;
       case DATA_EX:
       {
          DP_State = DATA_EX;
-         #ifdef EvaBoard_AT89C5132
-            // set LED's
-            SET_LED_YLW__;
-            CLR_LED_RED__;
-         #endif//#ifdef EvaBoard_AT89C5132
 
          if(    ( VPC3_GetDpState( eDpStateApplReady ) )
              && ( VPC3_GetDpState( eDpStateRun )  )
@@ -391,66 +344,8 @@ uint8_t bDpState;
 /*---------------------------------------------------------------------------*/
 void DpAppl_FatalError( DP_ERROR_FILE bFile, uint16_t wLine, VPC3_ERRCB_PTR sVpc3Error )
 {
-   #ifdef EvaBoard_AT89C5132
-      uint8_t i,j;
-
-      DP_WriteDebugBuffer__( FatalError__, sVpc3Error->bFunction, sVpc3Error->bErrorCode );
-
-      #ifdef RS232_SERIO
-         do
-         {
-            // wait!
-         }
-         while( bSndCounter > 80);
-
-         print_string("\r\nFatalError:");
-         print_string("\r\nFile: ");
-         print_hexbyte( bFile );
-         print_string("\r\nLine: ");
-         print_hexword( wLine );
-         print_string("\r\nFunction: ");
-         print_hexbyte( sVpc3Error->bFunction);
-         print_string("\r\nError_Code: ");
-         print_hexbyte( sVpc3Error->bErrorCode );
-         print_string("\r\nDetail: ");
-         print_hexbyte( sVpc3Error->bDetail );
-         print_string("\r\ncn_id: ");
-         print_hexbyte( sVpc3Error->bCnId );
-      #endif//#ifdef RS232_SERIO
-
-      *WRITE_PORT0 = sVpc3Error->bErrorCode;
-      *WRITE_PORT1 = bFile;
-      *WRITE_PORT2 = (uint8_t)wLine;
-
-      SET_LED_YLW__;
-      SET_LED_RED__;
-
-      while(1)
-      {
-         TOGGLE_LED_RED__;
-         TOGGLE_LED_YLW__;
-
-         #ifdef RS232_SERIO
-            if(bRecCounter > 0)
-            {
-               PrintSerialInputs();
-            }
-         #endif//#ifdef RS232_SERIO
-
-         for( i = 0; i < 255; i++ )
-         {
-            for(j = 0; j < 255; j++);
-         }
-      }//while(1)
-
-   #else
-
-      while(1)
-      {
-      }//while(1)
-
-   #endif//#ifdef EvaBoard_AT89C5132
-}//void DpAppl_FatalError( DP_ERROR_FILE bFile, uint16_t wLine, VPC3_ERRCB_PTR sVpc3Error )
+  #warning желательно куда-то выводить сообщения об ошибках
+}
 
 /*---------------------------------------------------------------------------*/
 /* function: DpAppl_MacReset                                                 */
