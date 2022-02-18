@@ -22,6 +22,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "dma.h"
 #include "platform.h"  
 
 //Инструкции для обмена с VPC3
@@ -452,6 +453,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   HAL_TIM_Base_Start_IT(&htim2);
+  UartSlaveRx(); //Запуск приема данных от CP24
   
   DpAppl_SetResetVPC3Channel1();
 
