@@ -35,6 +35,8 @@
 #define MAX_DOUT_BUF 30
 #define MAX_DIN_BUF 30
 
+uint8_t tmpBuf[128] = {0};
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -450,10 +452,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_TIM2_Init();
   HAL_TIM_Base_Start_IT(&htim2);
-  UartSlaveRx(); //Запуск приема данных от CP24
+  //UartSlaveRx(); //Запуск приема данных от CP24
   
   DpAppl_SetResetVPC3Channel1();
 
@@ -464,6 +467,7 @@ int main(void)
   while (1)
   {
       // call PROFIBUS
+    HAL_UART_Receive_DMA(&huart1, &tmpBuf[0], 128);
       DpAppl_ProfibusMain();
   }
 }
