@@ -23,7 +23,8 @@
 #include "usart.h"
 #include "gpio.h"
 #include "dma.h"
-#include "platform.h"  
+#include "platform.h"
+#include <string.h>
 
 //Инструкции для обмена с VPC3
 #define READ_BYTE_INSTRUCTION   0x13
@@ -463,11 +464,14 @@ int main(void)
   //initialize VPC3+C/S
   DpAppl_ProfibusInit();
 
-  
+   //__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+   memset(&tmpBuf[0], 0, sizeof(tmpBuf));
+   
   while (1)
   {
       // call PROFIBUS
-    HAL_UART_Receive_DMA(&huart1, &tmpBuf[0], 128);
+    //HAL_UART_Receive_DMA(&huart1, &tmpBuf[0], 6);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &tmpBuf[0], 6);
       DpAppl_ProfibusMain();
   }
 }
