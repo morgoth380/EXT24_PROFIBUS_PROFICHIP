@@ -472,7 +472,7 @@ int main(void)
       // call PROFIBUS
     //HAL_UART_Receive_DMA(&huart1, &tmpBuf[0], 6);
     HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &tmpBuf[0], 6);
-      DpAppl_ProfibusMain();
+    DpAppl_ProfibusMain();
   }
 }
 

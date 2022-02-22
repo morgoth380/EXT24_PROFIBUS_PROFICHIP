@@ -19,18 +19,24 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
+#include "crc.h"
+#include "platform.h"
+#include "DpAppl.h"
 #include <string.h>
 
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 
+extern DP_APPL_STRUC  sDpAppl;
+uint8_t TxBuf[128] = {0};    
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 void UartSlaveRx();
 uint8_t rxUartBuf[128];   
 uint8_t txUartBuf[128];
+void errIndGlowOff(void);
 
 /* USART1 init function */
 
@@ -158,6 +164,99 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
   /* USER CODE END USART1_MspDeInit 1 */
   }
+}
+
+
+/**
+  * @brief  
+  * @param  huart UART handle
+  * @param  Size  Number of data available in application reception buffer (indicates a position in
+  *               reception buffer until which, data are available)
+  * @retval None
+  */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+  uint16_t Crc;     //Принятая контрольная сумма идентификационной телеграммы
+  uint16_t CrcRx;   //Рассчитанная контрольная сумма идентификационной телеграммы
+  uint16_t dataLength;
+  uint16_t telegramType;
+  uint16_t TxDataLen;
+  identDataType  *idRxDataPnt;
+  RxExchDataType *RxDataPnt;
+  identAnswType  *idTxDataPnt;
+  static exchangeDataStateType exchangeDataState = EXT_BLOCK_IDENT;
+   
+  switch(exchangeDataState){
+  case EXT_BLOCK_IDENT:
+    idRxDataPnt = (identDataType *)huart->pRxBuffPtr;
+    dataLength = sizeof(identDataType) - sizeof(idRxDataPnt->crc);
+    Crc = GetCrc(idRxDataPnt, dataLength);
+    CrcRx = idRxDataPnt->crc;
+    
+    if(Crc == CrcRx){
+      telegramType = idRxDataPnt->header.bits.telegramType;
+      errIndGlowOff(); //Отключение индикации MK_ERR
+      if(telegramType == IDENT_TELEGRAM){
+        idTxDataPnt = (identAnswType *)&TxBuf[0];
+        idTxDataPnt->extBlock = PROFIBUS_EXT_BLOCK; //код блока расширения
+        TxDataLen = sizeof(identAnswType) - sizeof(idTxDataPnt->crc);
+        idTxDataPnt->crc = GetCrc((unsigned char *)(huart->pTxBuffPtr), TxDataLen);
+        HAL_UART_Transmit_DMA(huart, (uint8_t *)&TxBuf[0],  sizeof(identAnswType));
+      }else{
+        exchangeDataState = EXT_BLOCK_EXCHANGE;
+      }
+    }else{ //Если crc не совпало, то интерпретируем телеграмму как телеграмму обмена
+        RxDataPnt = (RxExchDataType *)huart->pRxBuffPtr;
+        Crc = GetCrc(RxDataPnt, sizeof(RxExchDataType) - sizeof(RxDataPnt->crc));
+        CrcRx = RxDataPnt->crc;
+        if(Crc == CrcRx){
+          errIndGlowOff(); //Отключение индикации MK_ERR
+          telegramType = RxDataPnt->header.bits.telegramType;
+          if(telegramType == EXCHANGE_TELEGRAM){
+            exchangeDataState = EXT_BLOCK_EXCHANGE;
+          }
+        }
+    }
+      
+    break;
+  case EXT_BLOCK_EXCHANGE: //Состояние обмена
+    //Проверим, является ли принятая телеграмма телеграммой идентификации
+    idRxDataPnt = (identDataType *)huart->pRxBuffPtr;
+    dataLength = sizeof(identDataType) - sizeof(idRxDataPnt->crc);
+    Crc = GetCrc(idRxDataPnt, dataLength);
+    CrcRx = idRxDataPnt->crc;
+    if(Crc == CrcRx){
+      errIndGlowOff(); //Отключение индикации MK_ERR
+      telegramType = idRxDataPnt->header.bits.telegramType;
+      if(telegramType == IDENT_TELEGRAM){
+         exchangeDataState = EXT_BLOCK_IDENT; //Возврат в состояние идентификации
+      }
+    }else{ //Является ли телеграмма телеграммой обмена
+      RxDataPnt = (RxExchDataType *)huart->pRxBuffPtr;
+      Crc = GetCrc(RxDataPnt, sizeof(RxExchDataType) - sizeof(RxDataPnt->crc));
+      CrcRx = RxDataPnt->crc;
+      if(Crc == CrcRx){
+        errIndGlowOff();
+        //Тут обрабатываем массив данных от CP24
+        memcpy(&sDpAppl.abDpInputData[0], &RxDataPnt->DoutData[0], sizeof(RxDataPnt->DoutData));
+      }
+    }
+    break;
+  }
+}
+
+
+/**
+  * @brief  Отключение светодиодной индикации аварии обмена
+  * @param
+  * @retval
+  */
+void errIndGlowOff(void)
+{
+#warning реализовать согласно настройкам периферии
+  //TIM_SetCounter(TIM17, 0);           //Сброс таймера аварии обмена
+  //glowErrState = RESET;               //Сброс индикации аварии обмена
+  //GPIO_ResetBits(GPIOC, GPIO_Pin_15); //Сброс индикации аварии обмена
 }
 
 void UartSlaveRx(void)

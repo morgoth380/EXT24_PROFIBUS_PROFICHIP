@@ -44,6 +44,58 @@ void MX_USART1_UART_Init(void);
 void UartSlaveRx(void);
 /* USER CODE END Prototypes */
 
+#define IDENT_TELEGRAM 0
+#define EXCHANGE_TELEGRAM 1
+
+#define DOUT_DATA_LENGTH 56
+
+typedef enum{
+  EXT_BLOCK_IDENT     =  0,
+  EXT_BLOCK_EXCHANGE  =  1
+}exchangeDataStateType;
+
+typedef union{
+  uint16_t word;
+  struct{
+    exchangeDataStateType telegramType  : 1;  //Тип запроса: индентификация блока расширения или обмен
+    uint16_t reserv                     : 15;
+  }bits;
+}headerType;
+
+typedef struct{
+  headerType header; 
+  uint8_t reserv;
+  uint16_t crc;
+}identDataType;
+
+typedef enum{
+  NOT_DEF             = 0,
+  INCREMENT_EXT_BLOCK = 1,
+  SERIAL_EXT_BLOCK    = 2,
+  SIN_COS_EXT_BLOCK   = 3,
+  RS485_EXT_BLOCK     = 4,
+  DIN_DOUT_EXT_BLOCK  = 5,
+  AIN_AOUT_EXT_BLOCK  = 6,
+  CAN_EXT_BLOCK       = 7,
+  PROFIBUS_EXT_BLOCK  = 8,
+  ETHER_EXT_BLOCK     = 9,
+  PROFINET_EXT_BLOCK  = 10
+}extBlockModeType;
+
+typedef struct{
+  extBlockModeType extBlock;
+  uint16_t crc;
+}identAnswType;
+
+
+  //Струткура принятых от верхнего уровня данных 
+typedef __packed struct{
+  headerType header;
+  uint8_t DoutData[DOUT_DATA_LENGTH]; //Входные данные ПЛК
+  uint16_t crc;
+}RxExchDataType;
+
+  
 #ifdef __cplusplus
 }
 #endif
