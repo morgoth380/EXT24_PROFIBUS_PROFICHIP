@@ -27,7 +27,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+//#include "DpCfg.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -88,10 +88,12 @@ typedef struct{
 }identAnswType;
 
 
+#warning как сделать так чтоб _DIN_BUFSIZE был равен DIN_BUFSIZE
+#define _DIN_BUFSIZE 0x36
   //Струткура принятых от верхнего уровня данных 
 typedef __packed struct{
   headerType header;
-  uint8_t DoutData[DOUT_DATA_LENGTH]; //Входные данные ПЛК
+  uint8_t DoutData[_DIN_BUFSIZE]; //Входные данные ПЛК
   uint16_t crc;
 }RxExchDataType;
 

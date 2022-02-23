@@ -73,7 +73,7 @@
    Use following values:
    - 0 to 244
 */
-#define DIN_BUFSIZE                 ((uint8_t)0x02)     // Length of the DIn Buffer (Data Slave to Master)                0..244
+#define DIN_BUFSIZE                 ((uint8_t)0x38)     // Length of the DIn Buffer (Data Slave to Master)                0..244
 
 /*!
    \def DOUT_BUFSIZE
@@ -82,7 +82,7 @@
    Use following values:
    - 0 to 244
 */
-#define DOUT_BUFSIZE                ((uint8_t)0x02)     // Length of the DOut Buffer     (Data Master to Slave)           0..244
+#define DOUT_BUFSIZE                ((uint8_t)0x38)     // Length of the DOut Buffer     (Data Master to Slave)           0..244
 
 /*!
    \def PRM_BUFSIZE

@@ -24,6 +24,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "platform.h"
+#include "stm32f1xx_hal_spi.h"
 #include <string.h>
 
 //Инструкции для обмена с VPC3
@@ -33,8 +34,8 @@
 #define WRITE_ARRAY_INSTRUCTION 0x02
 
 #warning Определиться с длиной
-#define MAX_DOUT_BUF 30
-#define MAX_DIN_BUF 30
+#define MAX_DOUT_BUF 70
+#define MAX_DIN_BUF 70
 
 uint8_t tmpBuf[128] = {0};
 
@@ -64,10 +65,11 @@ uint8_t tmpBuf[128] = {0};
 /* USER CODE END PV */
 
 #warning Определиться со временем
-#define TIMEOUT_VAL 300
+#define TIMEOUT_VAL 600
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+HAL_StatusTypeDef HAL_SPI_TransmitForMemSet(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 
 /* USER CODE BEGIN PFP */
 
@@ -294,11 +296,168 @@ uint8_t Vpc3Read( VPC3_ADR wAddress )
  */
 #if VPC3_SERIAL_MODE
 void Vpc3MemSet( VPC3_ADR wAddress, uint8_t bValue, uint16_t wLength )
-{
-   /** @todo Add your own code here! */
+{/*
+  uint16_t SPI_dataLength;
+  uint8_t WrBuf[MAX_DOUT_BUF] = {0}; //Локальный буфер для отправки
+  
+  WrBuf[0] = WRITE_ARRAY_INSTRUCTION; //Код операции
+  WrBuf[1] = ((uint16_t)wAddress >> 8) & 0x00FFU;                  //Старший байт адреса
+  WrBuf[2] = (uint16_t)wAddress & 0x00FFU;                         //Младший байт адреса
+  WrBuf[3] = bValue;
+  
+  SPI_dataLength = wLength;       
+  
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); //CS = Low
+  HAL_SPI_TransmitForMemSet(&hspi1, &WrBuf[0], SPI_dataLength, TIMEOUT_VAL);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);  //CS = High 
+  */
 }
 #endif//#if VPC3_SERIAL_MODE
 
+
+/**
+  * @brief  Transmit an amount of data in blocking mode.
+  * @param  hspi pointer to a SPI_HandleTypeDef structure that contains
+  *               the configuration information for SPI module.
+  * @param  pData pointer to data buffer
+  * @param  Size amount of data to be sent
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_SPI_TransmitForMemSet(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+{
+  uint32_t tickstart;
+  HAL_StatusTypeDef errorcode = HAL_OK;
+  uint16_t initial_TxXferCount;
+
+  /* Check Direction parameter */
+  assert_param(IS_SPI_DIRECTION_2LINES_OR_1LINE(hspi->Init.Direction));
+
+  /* Process Locked */
+  __HAL_LOCK(hspi);
+
+  /* Init tickstart for timeout management*/
+  tickstart = HAL_GetTick();
+  initial_TxXferCount = Size;
+
+  if (hspi->State != HAL_SPI_STATE_READY)
+  {
+    errorcode = HAL_BUSY;
+    goto error;
+  }
+
+  if ((pData == NULL) || (Size == 0U))
+  {
+    errorcode = HAL_ERROR;
+    goto error;
+  }
+
+  /* Set the transaction information */
+  hspi->State       = HAL_SPI_STATE_BUSY_TX;
+  hspi->ErrorCode   = HAL_SPI_ERROR_NONE;
+  hspi->pTxBuffPtr  = (uint8_t *)pData;
+  hspi->TxXferSize  = Size;
+  hspi->TxXferCount = Size;
+
+  /*Init field not used in handle to zero */
+  hspi->pRxBuffPtr  = (uint8_t *)NULL;
+  hspi->RxXferSize  = 0U;
+  hspi->RxXferCount = 0U;
+  hspi->TxISR       = NULL;
+  hspi->RxISR       = NULL;
+
+  /* Configure communication direction : 1Line */
+  if (hspi->Init.Direction == SPI_DIRECTION_1LINE)
+  {
+    /* Disable SPI Peripheral before set 1Line direction (BIDIOE bit) */
+    __HAL_SPI_DISABLE(hspi);
+    SPI_1LINE_TX(hspi);
+  }
+
+#if (USE_SPI_CRC != 0U)
+  /* Reset CRC Calculation */
+  if (hspi->Init.CRCCalculation == SPI_CRCCALCULATION_ENABLE)
+  {
+    SPI_RESET_CRC(hspi);
+  }
+#endif /* USE_SPI_CRC */
+
+  /* Check if the SPI is already enabled */
+  if ((hspi->Instance->CR1 & SPI_CR1_SPE) != SPI_CR1_SPE)
+  {
+    /* Enable SPI peripheral */
+    __HAL_SPI_ENABLE(hspi);
+  }
+
+  
+  /* Transmit data in 8 Bit mode */
+
+  hspi->TxXferCount = 3;
+  while (hspi->TxXferCount > 0U)
+  {
+    /* Wait until TXE flag is set to send data */
+    if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+    {
+      *((__IO uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
+      hspi->pTxBuffPtr += sizeof(uint8_t);
+      hspi->TxXferCount--;
+    }
+    else
+    {
+      /* Timeout management */
+      if ((((HAL_GetTick() - tickstart) >=  Timeout) && (Timeout != HAL_MAX_DELAY)) || (Timeout == 0U))
+      {
+        errorcode = HAL_TIMEOUT;
+        goto error;
+      }
+    }
+  }
+  
+  hspi->TxXferCount = Size;
+  while(hspi->TxXferCount > 0U)
+  {
+    /* Wait until TXE flag is set to send data */
+    if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
+    {
+      *((__IO uint8_t *)&hspi->Instance->DR) = (hspi->pTxBuffPtr[3]);
+      hspi->TxXferCount--;
+    }
+    else
+    {
+      /* Timeout management */
+      if ((((HAL_GetTick() - tickstart) >=  Timeout) && (Timeout != HAL_MAX_DELAY)) || (Timeout == 0U))
+      {
+        errorcode = HAL_TIMEOUT;
+        goto error;
+      }
+    }
+  }
+
+  /* Check the end of the transaction */
+  /*
+  if (SPI_EndRxTxTransaction(hspi, Timeout, tickstart) != HAL_OK)
+  {
+    hspi->ErrorCode = HAL_SPI_ERROR_FLAG;
+  }
+*/
+
+  /* Clear overrun flag in 2 Lines communication mode because received is not read */
+  if (hspi->Init.Direction == SPI_DIRECTION_2LINES)
+  {
+    __HAL_SPI_CLEAR_OVRFLAG(hspi);
+  }
+
+  if (hspi->ErrorCode != HAL_SPI_ERROR_NONE)
+  {
+    errorcode = HAL_ERROR;
+  }
+
+error:
+  hspi->State = HAL_SPI_STATE_READY;
+  /* Process Unlocked */
+  __HAL_UNLOCK(hspi);
+  return errorcode;
+}
 
 
 /*---------------------------------------------------------------------------*/
@@ -318,8 +477,8 @@ uint8_t Vpc3MemCmp( VPC3_UNSIGNED8_PTR pToVpc3Memory1, VPC3_UNSIGNED8_PTR pToVpc
 {
    /** @todo Add your own code here! */
 
-uint8_t bRetValue;
-uint16_t i;
+   uint8_t bRetValue;
+   uint16_t i;
 
    bRetValue = 0;
    for( i = 0; i < wLength; i++ )
@@ -439,7 +598,6 @@ void TestVpc3_01( void )
   */
 int main(void)
 {
-  
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -471,7 +629,7 @@ int main(void)
   {
       // call PROFIBUS
     //HAL_UART_Receive_DMA(&huart1, &tmpBuf[0], 6);
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &tmpBuf[0], 6);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &tmpBuf[0], sizeof(RxExchDataType));
     DpAppl_ProfibusMain();
   }
 }

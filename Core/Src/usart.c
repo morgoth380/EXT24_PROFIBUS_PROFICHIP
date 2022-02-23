@@ -238,7 +238,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
       if(Crc == CrcRx){
         errIndGlowOff();
         //Тут обрабатываем массив данных от CP24
-        memcpy(&sDpAppl.abDpInputData[0], &RxDataPnt->DoutData[0], sizeof(RxDataPnt->DoutData));
+        //memcpy(&sDpAppl.abDpInputData[0], &RxDataPnt->DoutData[0], sizeof(RxDataPnt->DoutData));
       }
     }
     break;
